@@ -1,6 +1,27 @@
 import type { ProtocolPosition } from "@/types/domain";
+import { formatTokenAmount, formatUsd } from "@/utils/format";
+
+function parseUsd(value: unknown): number | null {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    if (typeof value === "string") {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : null;
+    }
+    return null;
+}
+
+function formatHealthFactor(value: unknown): string {
+    if (value == null) return "-";
+    if (typeof value === "number" && Number.isFinite(value)) {
+        return value.toFixed(2);
+    }
+    // Some protocols represent HF as string or bigint-ish; just print it.
+    return String(value);
+}
 
 export default function PositionCard({ position }: { position: ProtocolPosition }) {
+    const netUsd = parseUsd(position.netValueUsd);
+
     return (
         <div
             style={{
@@ -17,33 +38,41 @@ export default function PositionCard({ position }: { position: ProtocolPosition 
 
             <div style={{ marginTop: 8 }}>
                 <div>
-                    <strong>Net (USD):</strong> {position.netValueUsd ?? "-"}
+                    <strong>Net (USD):</strong> {netUsd == null ? "-" : formatUsd(netUsd)}
                 </div>
                 <div>
-                    <strong>Health Factor:</strong> {position.health?.healthFactor ?? "-"}
+                    <strong>Health Factor:</strong> {formatHealthFactor(position.health?.healthFactor)}
                 </div>
             </div>
 
             <div style={{ marginTop: 10 }}>
                 <strong>Supplied</strong>
-                <ul>
-                    {(position.supplied ?? []).map((a) => (
-                        <li key={`${a.token.address}-${a.token.symbol}`}>
-                            {a.token.symbol}: {a.raw.toString()} (raw)
-                        </li>
-                    ))}
-                </ul>
+                {(position.supplied ?? []).length === 0 ? (
+                    <div style={{ color: "#666", marginTop: 6 }}>None</div>
+                ) : (
+                    <ul style={{ marginTop: 6 }}>
+                        {(position.supplied ?? []).map((a) => (
+                            <li key={`${a.token.address}-${a.token.symbol}`}>
+                                {a.token.symbol}: {formatTokenAmount(a.raw, a.token.decimals)}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
 
             <div style={{ marginTop: 10 }}>
                 <strong>Borrowed</strong>
-                <ul>
-                    {(position.borrowed ?? []).map((a) => (
-                        <li key={`${a.token.address}-${a.token.symbol}`}>
-                            {a.token.symbol}: {a.raw.toString()} (raw)
-                        </li>
-                    ))}
-                </ul>
+                {(position.borrowed ?? []).length === 0 ? (
+                    <div style={{ color: "#666", marginTop: 6 }}>None</div>
+                ) : (
+                    <ul style={{ marginTop: 6 }}>
+                        {(position.borrowed ?? []).map((a) => (
+                            <li key={`${a.token.address}-${a.token.symbol}`}>
+                                {a.token.symbol}: {formatTokenAmount(a.raw, a.token.decimals)}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
         </div>
     );

@@ -2,22 +2,23 @@ import { useEffect, useMemo, useState } from "react";
 import type { ProtocolPosition } from "@/types/domain";
 import { protocolRegistry } from "@/services/protocols/registry";
 import PositionCard from "@/components/PositionCard";
-import { useUIStore } from "@/stores/uiStore";
+import { useUIStore, type UIState } from "@/stores/uiStore";
 
 export default function Dashboard() {
     const [positions, setPositions] = useState<ProtocolPosition[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
     const address = "0x0000000000000000000000000000000000000000" as const;
 
-    const selectedChainId = useUIStore((s) => s.selectedChainId);
-    const showTestnets = useUIStore((s) => s.showTestnets);
-    const setSelectedChainId = useUIStore((s) => s.setSelectedChainId);
-    const toggleShowTestnets = useUIStore((s) => s.toggleShowTestnets);
+    const selectedChainId = useUIStore((s: UIState) => s.selectedChainId);
+    const showTestnets = useUIStore((s: UIState) => s.showTestnets);
+    const setSelectedChainId = useUIStore((s: UIState) => s.setSelectedChainId);
+    const toggleShowTestnets = useUIStore((s: UIState) => s.toggleShowTestnets);
 
     const chain = useMemo(() => protocolRegistry[selectedChainId], [selectedChainId]);
 
     const chainIds = useMemo(() => {
-        // For now we’re not filtering by showTestnets because we don’t have chain metadata.
-        // We keep the flag in UI state so the UI is already wired for the next step.
+        // Filtering comes later once we have chain metadata (isTestnet).
         void showTestnets;
 
         return Object.keys(protocolRegistry)
@@ -29,16 +30,25 @@ export default function Dashboard() {
     useEffect(() => {
         let cancelled = false;
 
-        // Prevent stale positions showing when switching chains
+        setIsLoading(true);
         setPositions([]);
 
         const run = async () => {
             const services = Object.values(chain ?? {});
             const all = (await Promise.all(services.map((s) => s.getUserPositions(address)))).flat();
-            if (!cancelled) setPositions(all);
+
+            if (!cancelled) {
+                setPositions(all);
+                setIsLoading(false);
+            }
         };
 
-        run();
+        run().catch(() => {
+            if (!cancelled) {
+                setPositions([]);
+                setIsLoading(false);
+            }
+        });
 
         return () => {
             cancelled = true;
@@ -71,9 +81,15 @@ export default function Dashboard() {
                 </label>
             </div>
 
-            {positions.map((p) => (
-                <PositionCard key={`${p.protocolId}-${p.chainId}`} position={p} />
-            ))}
+            {isLoading ? (
+                <p style={{ color: "#555" }}>Loading positions…</p>
+            ) : positions.length === 0 ? (
+                <p style={{ color: "#555" }}>No positions found (mock).</p>
+            ) : (
+                positions.map((p) => (
+                    <PositionCard key={`${p.protocolId}-${p.chainId}`} position={p} />
+                ))
+            )}
         </div>
     );
 }
