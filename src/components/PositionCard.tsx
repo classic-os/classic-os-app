@@ -1,5 +1,6 @@
 import type { ProtocolPosition } from "@/types/domain";
 import { formatTokenAmount, formatUsd } from "@/utils/format";
+import { getChainMeta } from "@/constants/chains";
 
 function parseUsd(value: unknown): number | null {
     if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -21,6 +22,7 @@ function formatHealthFactor(value: unknown): string {
 
 export default function PositionCard({ position }: { position: ProtocolPosition }) {
     const netUsd = parseUsd(position.netValueUsd);
+    const chainMeta = getChainMeta(position.chainId);
 
     return (
         <div
@@ -33,7 +35,9 @@ export default function PositionCard({ position }: { position: ProtocolPosition 
         >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <strong>{position.label}</strong>
-                <span style={{ color: "#666" }}>Chain {position.chainId}</span>
+                <span style={{ color: "#666" }}>
+                    {chainMeta ? chainMeta.name : `Chain ${position.chainId}`}
+                </span>
             </div>
 
             <div style={{ marginTop: 8 }}>

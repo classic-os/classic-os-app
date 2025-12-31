@@ -5,6 +5,7 @@ import PositionCard from "@/components/PositionCard";
 import { useUIStore, type UIState } from "@/stores/uiStore";
 import { useAccount } from "wagmi";
 import ConnectButton from "@/components/ConnectButton";
+import { CHAINS } from "@/constants/chains";
 
 export default function Dashboard() {
     const [positions, setPositions] = useState<ProtocolPosition[]>([]);
@@ -19,12 +20,18 @@ export default function Dashboard() {
 
     const chain = useMemo(() => protocolRegistry[selectedChainId], [selectedChainId]);
 
-    const chainIds = useMemo(() => {
-        void showTestnets;
-        return Object.keys(protocolRegistry)
-            .map((id) => Number(id))
-            .filter((n) => Number.isFinite(n))
-            .sort((a, b) => a - b);
+    const chainOptions = useMemo(() => {
+        // Only show chains that actually exist in the protocol registry
+        const idsInRegistry = new Set(
+            Object.keys(protocolRegistry)
+                .map((id) => Number(id))
+                .filter((n) => Number.isFinite(n))
+        );
+
+        return CHAINS
+            .filter((c) => idsInRegistry.has(c.id))
+            .filter((c) => showTestnets || !c.isTestnet)
+            .sort((a, b) => a.id - b.id);
     }, [showTestnets]);
 
     useEffect(() => {
@@ -42,7 +49,9 @@ export default function Dashboard() {
 
         const run = async () => {
             const services = Object.values(chain ?? {});
-            const all = (await Promise.all(services.map((s) => s.getUserPositions(address as `0x${string}`)))).flat();
+            const all = (
+                await Promise.all(services.map((s) => s.getUserPositions(address as `0x${string}`)))
+            ).flat();
 
             if (!cancelled) {
                 setPositions(all);
@@ -74,11 +83,11 @@ export default function Dashboard() {
 
             <div style={{ marginBottom: 12 }}>
                 <label>
-                    Chain ID:&nbsp;
+                    Chain:&nbsp;
                     <select value={selectedChainId} onChange={(e) => setSelectedChainId(Number(e.target.value))}>
-                        {chainIds.map((id) => (
-                            <option key={id} value={id}>
-                                {id}
+                        {chainOptions.map((c) => (
+                            <option key={c.id} value={c.id}>
+                                {c.name} ({c.id})
                             </option>
                         ))}
                     </select>
