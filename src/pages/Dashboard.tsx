@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { ProtocolPosition } from "@/types/domain";
 import { protocolRegistry } from "@/services/protocols/registry";
 import PositionCard from "@/components/PositionCard";
+import { DEFAULT_CHAIN_ID } from "@/config/runtime";
+
 
 export default function Dashboard() {
     const [positions, setPositions] = useState<ProtocolPosition[]>([]);
@@ -9,7 +11,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         const run = async () => {
-            const chain = protocolRegistry[1];
+            const chain = protocolRegistry[DEFAULT_CHAIN_ID];
             const services = Object.values(chain ?? {});
             const all = (
                 await Promise.all(services.map((s) => s.getUserPositions(address)))
