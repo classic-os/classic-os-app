@@ -48,9 +48,7 @@ export default function Dashboard() {
 
         const run = async () => {
             const services = Object.values(chain ?? {});
-            const all = (
-                await Promise.all(services.map((s) => s.getUserPositions(address as `0x${string}`)))
-            ).flat();
+            const all = (await Promise.all(services.map((s) => s.getUserPositions(address)))).flat();
 
             if (!cancelled) {
                 setPositions(all);
