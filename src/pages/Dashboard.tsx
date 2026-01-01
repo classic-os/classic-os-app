@@ -6,6 +6,7 @@ import { useUIStore, type UIState } from "@/stores/uiStore";
 import { useAccount } from "wagmi";
 import ConnectButton from "@/components/ConnectButton";
 import { CHAINS } from "@/constants/chains";
+import { FEATURE_LIVE_READS } from "@/config/featureFlags";
 
 export default function Dashboard() {
     const [positions, setPositions] = useState<ProtocolPosition[]>([]);
@@ -21,7 +22,6 @@ export default function Dashboard() {
     const chain = useMemo(() => protocolRegistry[selectedChainId], [selectedChainId]);
 
     const chainOptions = useMemo(() => {
-        // Only show chains that actually exist in the protocol registry
         const idsInRegistry = new Set(
             Object.keys(protocolRegistry)
                 .map((id) => Number(id))
@@ -37,7 +37,6 @@ export default function Dashboard() {
     useEffect(() => {
         let cancelled = false;
 
-        // If wallet isn't connected, we don't fetch positions.
         if (!isConnected || !address) {
             setIsLoading(false);
             setPositions([]);
@@ -76,7 +75,9 @@ export default function Dashboard() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                     <h1 style={{ margin: 0 }}>Classic OS</h1>
-                    <p style={{ marginTop: 6, color: "#555" }}>Dashboard (mock data)</p>
+                    <p style={{ marginTop: 6, color: "#555" }}>
+                        Dashboard ({FEATURE_LIVE_READS ? "live reads enabled" : "mock mode"})
+                    </p>
                 </div>
                 <ConnectButton />
             </div>
@@ -84,7 +85,10 @@ export default function Dashboard() {
             <div style={{ marginBottom: 12 }}>
                 <label>
                     Chain:&nbsp;
-                    <select value={selectedChainId} onChange={(e) => setSelectedChainId(Number(e.target.value))}>
+                    <select
+                        value={selectedChainId}
+                        onChange={(e) => setSelectedChainId(Number(e.target.value))}
+                    >
                         {chainOptions.map((c) => (
                             <option key={c.id} value={c.id}>
                                 {c.name} ({c.id})
@@ -104,7 +108,7 @@ export default function Dashboard() {
             ) : isLoading ? (
                 <p style={{ color: "#555" }}>Loading positions…</p>
             ) : positions.length === 0 ? (
-                <p style={{ color: "#555" }}>No positions found (mock).</p>
+                <p style={{ color: "#555" }}>No positions found.</p>
             ) : (
                 positions.map((p) => <PositionCard key={`${p.protocolId}-${p.chainId}`} position={p} />)
             )}
