@@ -1,18 +1,29 @@
+// src/services/protocols/registry.ts
 import type { ChainProtocolRegistry } from "./types";
-import { AaveV3EthereumMock } from "./mock/AaveV3Ethereum.mock";
-import { AaveV3EthereumLive } from "./live/AaveV3Ethereum.live";
 import { FEATURE_LIVE_READS } from "@/config/featureFlags";
+import { selectByFlag } from "./select";
+
+import {
+    AaveV3EthereumLive,
+    AaveV3EthereumMock,
+    AaveV3SepoliaLive,
+    AaveV3SepoliaMock,
+} from "./aave-v3";
+
+// Ethereum mainnet selection (live vs mock behind a single flag)
+const aaveV3Ethereum = selectByFlag(FEATURE_LIVE_READS, AaveV3EthereumLive, AaveV3EthereumMock);
+
+// Sepolia selection (also behind the same flag so testnet can be “real” when live reads are on)
+const aaveV3Sepolia = selectByFlag(FEATURE_LIVE_READS, AaveV3SepoliaLive, AaveV3SepoliaMock);
 
 export const protocolRegistry: ChainProtocolRegistry = {
+    // Ethereum mainnet
     1: {
-        // Phase 3: swap mock → live behind a single flag, Ethereum mainnet only.
-        [(FEATURE_LIVE_READS ? AaveV3EthereumLive : AaveV3EthereumMock).id]: FEATURE_LIVE_READS
-            ? AaveV3EthereumLive
-            : AaveV3EthereumMock,
+        [aaveV3Ethereum.id]: aaveV3Ethereum,
     },
 
-    // Sepolia stays mocked for now.
+    // Sepolia (first functional testnet)
     11155111: {
-        [AaveV3EthereumMock.id]: AaveV3EthereumMock,
+        [aaveV3Sepolia.id]: aaveV3Sepolia,
     },
 };

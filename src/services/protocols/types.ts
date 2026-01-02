@@ -1,33 +1,43 @@
-import type { Address, ChainId, ProtocolPosition, ProtocolType, Token, TxPlan } from "@/types/domain";
+// src/services/protocols/types.ts
+import type { Address, ProtocolPosition, TxPlan } from "@/types/domain";
 
-export type ProtocolService = {
-    // stable internal id, e.g. "aave-v3-eth"
-    id: string;
+export type ProtocolType = "lending" | "dex" | "launchpad" | "fiat" | "unknown";
 
-    // display name, e.g. "Aave V3"
-    name: string;
-
-    // each service is chain-specific
-    chainId: ChainId;
-
-    protocolType: ProtocolType;
-
-    // reads
-    getUserPositions(address: Address): Promise<ProtocolPosition[]>;
-
-    // write intent: returns a plan (no sending/signing here)
-    supply?: (token: Token, amount: bigint) => Promise<TxPlan>;
-    withdraw?: (token: Token, amount: bigint) => Promise<TxPlan>;
-    borrow?: (token: Token, amount: bigint) => Promise<TxPlan>;
-    repay?: (token: Token, amount: bigint) => Promise<TxPlan>;
-
-    // capability introspection for UI gating
-    supports: {
-        supply: boolean;
-        withdraw: boolean;
-        borrow: boolean;
-        repay: boolean;
-    };
+export type ProtocolSupports = {
+    supply?: boolean;
+    withdraw?: boolean;
+    borrow?: boolean;
+    repay?: boolean;
+    swap?: boolean;
+    addLiquidity?: boolean;
+    removeLiquidity?: boolean;
 };
 
-export type ChainProtocolRegistry = Record<ChainId, Record<string, ProtocolService>>;
+export type ProtocolService = {
+    /** Stable internal identifier (do not change once released) */
+    id: string;
+
+    /** Human readable name (UI display) */
+    name: string;
+
+    /** EVM chain id this service is scoped to */
+    chainId: number;
+
+    /** Rough category used for grouping / routing */
+    protocolType: ProtocolType;
+
+    /** Capability hints; keep honest (false until actions exist) */
+    supports?: ProtocolSupports;
+
+    /** Read-only: return normalized positions for this user */
+    getUserPositions(address: Address): Promise<ProtocolPosition[]>;
+
+    /** Optional action builders (TxPlan). Keep stubs allowed for now. */
+    supply?: (...args: any[]) => Promise<TxPlan>;
+    withdraw?: (...args: any[]) => Promise<TxPlan>;
+    borrow?: (...args: any[]) => Promise<TxPlan>;
+    repay?: (...args: any[]) => Promise<TxPlan>;
+};
+
+export type ChainProtocolMap = Record<string, ProtocolService>;
+export type ChainProtocolRegistry = Record<number, ChainProtocolMap>;

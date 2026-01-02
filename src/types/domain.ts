@@ -1,5 +1,5 @@
+// src/types/domain.ts
 export type Address = `0x${string}`;
-
 export type ChainId = number;
 
 export type Token = {
@@ -16,12 +16,10 @@ export type Amount = {
     raw: bigint; // always raw units
 };
 
-export type ProtocolId = string; // e.g. "aave-v3-eth", "compound-v3-base"
-
-export type ProtocolType = "lending" | "dex" | "yield" | "derivatives" | "other";
+export type ProtocolId = string;
 
 export type Health = {
-    healthFactor?: number; // lending protocols
+    healthFactor?: number;
     liquidationThreshold?: number;
     ltv?: number;
 };
@@ -29,7 +27,7 @@ export type Health = {
 export type ProtocolPosition = {
     protocolId: ProtocolId;
     chainId: ChainId;
-    label: string; // human-readable display name
+    label: string;
     supplied?: Amount[];
     borrowed?: Amount[];
     netValueUsd?: number;
