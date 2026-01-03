@@ -21,14 +21,12 @@ It is a **meta dapp** designed to *use* protocols across these ecosystems.
 * Establish a **network-scoped DeFi operating system**
 * Treat protocols as **chain-specific**, not globally interchangeable
 * Provide a **single, trusted interface** to:
-
   * observe positions
   * interact with protocols
   * navigate the ETC ecosystem
 * Position Classic OS as:
-
   * the **home interface for ETC**
-  * a **credible bridge to ETH DeFi state**
+  * a **credible reference surface for ETH DeFi**
 * Avoid scope creep through explicit non-goals
 
 ---
@@ -47,19 +45,15 @@ Classic OS launches with **two first-class anchor networks**, each with an assoc
 Testnets are used exclusively for **adapter validation and development**.
 They are not treated as product networks.
 
-No other networks are included during MVP.
-
 ---
 
 ## Architectural Principles
 
 ### Network-Scoped Protocols
-
 Protocols are **network-scoped**.
 Classic OS does not assume protocol parity across chains.
 
 ### UI Modularity
-
 UI modules are **position-type and action-type driven**, not protocol-name driven.
 
 * Lending positions share common UI modules across protocols
@@ -67,26 +61,9 @@ UI modules are **position-type and action-type driven**, not protocol-name drive
 * DEX V3 NFT LPs share common UI modules across networks
 
 ### Native Flows, No Embedding
-
 Classic OS implements **native interaction flows** for supported actions and does **not embed third-party dapp UIs**.
 
 External products are **linked and surfaced**, not embedded.
-
----
-
-## Testnet Policy
-
-Testnets exist to validate:
-
-* Protocol adapters
-* Network-specific UX
-* Action gating and capability detection
-
-Classic OS does **not**:
-
-* Market testnets as products
-* Guarantee protocol parity on testnets
-* Treat testnets as long-lived user destinations
 
 ---
 
@@ -95,7 +72,7 @@ Classic OS does **not**:
 The following are intentionally **out of scope** for the MVP:
 
 * ❌ Oracles (e.g. Chainlink)
-* ❌ Cross-chain bridges (full integrations)
+* ❌ Cross-chain bridges
 * ❌ Governance interfaces
 * ❌ Automated strategies or bots
 * ❌ Yield aggregation
@@ -110,22 +87,21 @@ NFTs are supported **only** where they represent **financial positions**
 
 ## Development Phases
 
-### ✅ Phase 1 — Foundation (`v0.0.1`)
+---
 
+### ✅ Phase 1 — Foundation (`v0.0.1`)
 **Status: Complete**
 
-* Vite + React + TypeScript scaffold
+* App scaffold (Vite, React, TypeScript)
 * Strict domain model (`Token`, `ProtocolPosition`, `TxPlan`)
 * Protocol service abstraction
 * Network-scoped protocol registry
-* Path aliasing (`@/`)
-* Mock protocol adapters
-* Deterministic, testable architecture baseline
+* Mock adapters and feature flags
+* Deterministic, testable baseline
 
 ---
 
 ### ✅ Phase 2 — Wallet & Chain Awareness (`v0.0.2`)
-
 **Status: Complete**
 
 * Wallet connection
@@ -136,239 +112,151 @@ NFTs are supported **only** where they represent **financial positions**
 ---
 
 ### ✅ Phase 3 — First Live Protocol Read (`v0.0.3`)
-
 **Status: Complete**
 
 * Live on-chain reads
-* Multicall-based hydration
+* Multicall hydration
 * Metadata normalization
-* Feature-flagged protocol adapters
+* Feature-flagged adapters
 
 ---
 
 ### ✅ Phase 4 — Reserve-Level ETH Positions (`v0.0.4`)
-
 **Status: Complete**
 
-* **Aave V3 (Ethereum)**
-
-  * Supplied assets
-  * Borrowed assets
-  * Health factor
-  * Net value
-* Proven adapter pattern on mainnet data
-* Dashboard rendering from live state
+* Aave V3 (Ethereum)
+* Supplied / borrowed assets
+* Health factor and net value
+* Proven mainnet adapter pattern
 
 ---
 
-## ▶️ Phase 5 — App Shell & ETH DeFi Coverage (`v0.0.5`)
+### ✅ Phase 5 — ETH DeFi Coverage & App Framework (`v0.0.5`)
+**Status: Complete**
 
-### Phase 5A — Application Shell
+Phase 5 establishes Classic OS as a **credible DeFi operating system**, not a prototype.
 
-**Status: In Progress**
-
-**Objective:**
-Establish Classic OS as an *operating system*, not a single-page dashboard.
-
-**Implemented:**
-
-* Global application shell
-
-  * Persistent left sidebar navigation
-  * Persistent top bar
+* Persistent sidebar and top bar
 * Router-backed page structure
-* Global wallet and chain context moved into TopBar
-* Capability-oriented sidebar navigation
-
-  * Portfolio
-  * Swap
-  * Lend / Borrow
-  * Liquidity
+* Capability-oriented navigation
 * External ecosystem links (no embedding)
+* **Aave V3, Compound V3**
+* **Uniswap V2, Uniswap V3 (NFT LPs with real math)**
+* Sepolia used for adapter and UX validation
 
-  * Token launch (external launchpad)
-  * Fiat on / off-ramp (Brale)
-* Structural UI boundaries (sidebar divider, footer spacer)
-
-**Remaining:**
-
-* Network-aware enable / disable states
-* Clear “coming soon” gating for unsupported actions
-
-This phase defines **capabilities and structure**, not full implementations.
+At the end of Phase 5:
+* ETH side is **functionally complete**
+* Adapter architecture is **proven**
+* UI structure is **stable but intentionally unbranded**
 
 ---
 
-### Phase 5B — ETH DeFi Coverage
+## ▶️ Phase 6 — Product Surface & Brand Foundation (`v0.0.6`)
 
-**Objective:**
-Make the ETH side feel *credible, modern, and familiar* using **actively maintained DeFi primitives**.
+This phase transitions Classic OS from an internal application into a **public-facing product**.
 
-Phase 5B intentionally prioritizes **current-generation protocols** over legacy maintenance.
+### Objectives
 
-#### Testnet Validation (ETH)
+* Establish trust, clarity, and professionalism
+* Separate **product surface** from **application runtime**
+* Lay the groundwork for external users and contributors
 
-* **Sepolia**
+### Deliverables
 
-  * Adapter correctness validation
-  * Wallet and chain UX testing
-  * No requirement for full protocol parity
+**New repositories (Classic OS GitHub org):**
 
----
+* `classic-os-site`
+  * Public landing page
+  * Product positioning (ETH ↔ ETC)
+  * Feature overview
+  * Deep links into the app
 
-#### Lending (Core)
+* `classic-os-docs`
+  * Architecture overview
+  * Network and protocol philosophy
+  * User-facing explanations
+  * Roadmap and changelog
 
-* **Aave V3**
+* `classic-os-assets`
+  * Logos
+  * Color system
+  * Typography
+  * OG / social images
 
-  * Primary multi-asset lending reference
-  * Already implemented on Ethereum mainnet
+### Constraints
 
-* **Compound V3**
+* No wallet connection on the landing site
+* No app logic duplication
+* No premature marketing claims
 
-  * Next lending protocol to integrate
-  * Single-borrow-asset model
-  * Clean, modern architecture
-  * Supported across Ethereum and major L2s
-
----
-
-#### DEX / Liquidity (Core)
-
-* **Uniswap V2**
-
-  * Canonical constant-product AMM
-  * LP positions rendered via generic DEX V2 UI modules
-
-* **Uniswap V3**
-
-  * Concentrated liquidity positions (NFT-based)
-  * Rendered via position-type UI modules
+This phase is about **credibility and framing**, not growth.
 
 ---
 
-#### Legacy / Mainnet-Only (Deferred)
+## ▶️ Phase 7 — ETC Network Enablement (`v0.0.7`)
 
-The following protocols are **explicitly deferred** and may be added later
-*only if user demand justifies the maintenance cost*:
-
-* Aave V2
-* Compound V2
-* Maker-style vault systems
-
-These are treated as **legacy state visibility**, not strategic coverage.
-
-Positions render via **position-type UI modules**, not protocol-specific UIs.
-
----
-
-## ▶️ Phase 6 — ETC Network Enablement (`v0.0.6`)
-
-**Structural milestone**
-
-Ethereum Classic is introduced as a first-class PoW anchor network, with
-**Mordor testnet support preceding mainnet activation**.
+Ethereum Classic is introduced as a first-class PoW anchor network.
 
 * Add **Mordor (ETC testnet)** support
-
-  * Validate protocol adapters
-  * Validate PoW-specific UX assumptions
+* Validate PoW-specific UX assumptions
 * Add **Ethereum Classic (ETC mainnet)** support
 * Implement:
-
   * **WETC** token primitive
   * **ETCswap V2** adapter
-* Validate:
-
-  * Network-specific protocol availability
-  * Graceful handling of unsupported actions
+* Gracefully handle unsupported actions
 
 This phase proves PoW parity at the **architecture level**, not feature parity.
 
 ---
 
-### ETC Stablecoin Primitive (USC)
+## ▶️ Phase 8 — ETC DeFi Expansion (`v0.1.0` — Internal MVP)
 
-Ethereum Classic’s canonical stablecoin is **Classic USD (USC)**.
-
-* USC is treated as a **first-class token primitive**
-* Balances, swaps, and liquidity positions are supported
-* Mint and redeem flows are **externally managed** (Brale)
-* Classic OS links to issuer-managed UX and does not embed it
-
----
-
-## ▶️ Phase 7 — ETC DeFi Expansion (`v0.1.0` — Internal MVP)
-
-**Differentiation milestone**
-
-* **ETCswap V3** adapter
+* ETCswap V3 adapter
 * ETC dashboard parity:
-
-  * DEX positions
   * Token holdings
+  * DEX positions
   * Liquidity visibility
 * ETC-first UX assumptions
 
 At this point:
-
-* **ETH** = liquidity and reference layer
-* **ETC** = execution and experimentation hub
+* **ETH** = reference & liquidity layer
+* **ETC** = execution & experimentation hub
 
 This constitutes the **internal Classic OS MVP**.
 
 ---
 
-## ▶️ Phase 8 — ETC Ecosystem Product Integration (`v0.1.x`)
+## ▶️ Phase 9 — ETC Ecosystem Product Integration (`v0.1.x`)
 
-Classic OS integrates **external ETC products** without embedding them.
-
-### ETCswap Launchpad (External)
-
-* Product lives at `launchpad.etcswap.org`
-* Classic OS responsibilities:
-
-  * Discover launchpad-origin tokens
-  * Display balances and liquidity
-  * Attribute origin clearly
-  * Deep-link to product UI
-
-Classic OS does **not** own:
-
-* Token creation flows
-* Deployment UX
-* Liquidity bootstrapping logic
+* External ETC product discovery
+* Token attribution and origin tracking
+* Deep links to product UIs
+* No embedding or ownership of external flows
 
 ---
 
-## ▶️ Phase 9 — Branding & Robust UI (`v0.1.x`)
+## ▶️ Phase 10 — UI Hardening & Brand Completion (`v0.1.x`)
 
-**Required before external visibility**
-
-* Visual identity (logo, color system, typography)
-* Network-aware grouping
-* Action-type grouping
-* Robust formatting for small or zero balances
-* Clear empty and unsupported states
-* Light landing framing
-
-This phase is about **trust signaling**, not cosmetic polish.
+* Final visual identity across app + site
+* Design system consolidation
+* Robust empty and unsupported states
+* Network-aware grouping and clarity
+* Trust signaling polish
 
 ---
 
-## ▶️ Phase 10 — Data Layer Hardening (`v0.2.x`)
+## ▶️ Phase 11 — Data Layer Hardening (`v0.2.x`)
 
 * Query caching and staleness control
 * Retry and backoff strategies
 * RPC fallback support
-* Code splitting and performance optimization
+* Performance and code-splitting
 
 ---
 
 ## Final Positioning
 
-Classic OS does not attempt to treat all chains equally.
-
-It intentionally positions:
+Classic OS intentionally positions:
 
 * **Ethereum (ETH)** as the mature PoS DeFi reference layer
 * **Ethereum Classic (ETC)** as the PoW execution and issuance frontier
