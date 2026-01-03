@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+// src/pages/Dashboard.tsx (or wherever Dashboard lives)
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ProtocolPosition } from "@/types/domain";
 import { protocolRegistry } from "@/services/protocols/registry";
 import PositionCard from "@/components/PositionCard";
@@ -13,7 +14,6 @@ export function Dashboard() {
 
     const { address, isConnected } = useAccount();
 
-    // Chain context now lives in TopBar, but Dashboard still *consumes* it.
     const selectedChainId = useUIStore((s: UIState) => s.selectedChainId);
     const showTestnets = useUIStore((s: UIState) => s.showTestnets);
 
@@ -24,8 +24,11 @@ export function Dashboard() {
         return found?.name ?? `Chain ${selectedChainId}`;
     }, [selectedChainId]);
 
+    // ✅ request-id guard to prevent stale overwrites
+    const requestIdRef = useRef(0);
+
     useEffect(() => {
-        let cancelled = false;
+        const requestId = ++requestIdRef.current;
 
         if (!isConnected || !address) {
             setIsLoading(false);
@@ -40,22 +43,19 @@ export function Dashboard() {
             const services = Object.values(chain ?? {});
             const all = (await Promise.all(services.map((s) => s.getUserPositions(address)))).flat();
 
-            if (!cancelled) {
+            // ✅ only commit if this is still the latest request
+            if (requestIdRef.current === requestId) {
                 setPositions(all);
                 setIsLoading(false);
             }
         };
 
         run().catch(() => {
-            if (!cancelled) {
+            if (requestIdRef.current === requestId) {
                 setPositions([]);
                 setIsLoading(false);
             }
         });
-
-        return () => {
-            cancelled = true;
-        };
     }, [chain, address, isConnected]);
 
     return (

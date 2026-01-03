@@ -12,12 +12,19 @@ import {
 
 import { CompoundV3EthereumLive, CompoundV3EthereumMock } from "./compound-v3";
 
+import { UniswapV2EthereumLive, UniswapV2EthereumMock } from "./uniswap-v2";
+
 // Ethereum mainnet selection (live vs mock behind a single flag)
 const aaveV3Ethereum = selectByFlag(FEATURE_LIVE_READS, AaveV3EthereumLive, AaveV3EthereumMock);
 const compoundV3Ethereum = selectByFlag(
     FEATURE_LIVE_READS,
     CompoundV3EthereumLive,
     CompoundV3EthereumMock
+);
+const uniswapV2Ethereum = selectByFlag(
+    FEATURE_LIVE_READS,
+    UniswapV2EthereumLive,
+    UniswapV2EthereumMock
 );
 
 // Sepolia selection (also behind the same flag so testnet can be “real” when live reads are on)
@@ -28,6 +35,7 @@ export const protocolRegistry: ChainProtocolRegistry = {
     1: {
         [aaveV3Ethereum.id]: aaveV3Ethereum,
         [compoundV3Ethereum.id]: compoundV3Ethereum,
+        [uniswapV2Ethereum.id]: uniswapV2Ethereum,
     },
 
     // Sepolia (first functional testnet)
